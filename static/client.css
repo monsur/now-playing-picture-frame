@@ -1,0 +1,54 @@
+html {
+  height: 100%;
+}
+
+body {
+  background-attachment: fixed;
+  background-color: #111;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.spotifyContent {
+  background-color: #333;
+  opacity: 0.9;
+  float: right;
+  margin: 30% 0 0 0;
+  max-width: 900px;
+}
+
+.spotifyLeft {
+  float: left;
+  color: #ddd;
+  padding-left: 20px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 730px;
+}
+
+.songTitle {
+  color: #fff;
+  font-size: 30px;
+}
+
+.spotifyRight {
+  float: right;
+  padding-left: 30px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 100px;
+}
+
+.spotifyRight img {
+  height: 100px;
+  width: 100px;
+}

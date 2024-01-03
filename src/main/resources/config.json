@@ -1,0 +1,25 @@
+{
+  "spotify": {
+    "pollingMs": 5000,
+    "auth": {
+      "clientId": "",
+      "clientSecret": "",
+      "redirectUri": "",
+      "scope": "",
+      "authorizeUri": "https://accounts.spotify.com/authorize",
+      "tokenUri": "https://accounts.spotify.com/api/token"
+    }
+  },
+  "photos": {
+    "album": "",
+    "pollingMs": 30000,
+    "auth": {
+      "clientId": "",
+      "clientSecret": "",
+      "redirectUri": "",
+      "scope": "",
+      "authorizeUri": "https://accounts.google.com/o/oauth2/v2/auth",
+      "tokenUri": "https://oauth2.googleapis.com/token"
+    }
+  }
+}
