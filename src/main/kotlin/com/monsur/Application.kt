@@ -65,6 +65,7 @@ fun main() {
                 get {
                     val authResp = spotifyAuth.parseAuthorizeResponse(call.request.queryParameters)
                     spotifyAuth.retrieveToken(authResp)
+                    call.application.environment.log.info("Received Spotify token")
                     call.respondRedirect("/start.html")
                 }
             }
@@ -81,6 +82,7 @@ fun main() {
                 get {
                     val authResp = photosAuth.parseAuthorizeResponse(call.request.queryParameters)
                     photosAuth.retrieveToken(authResp)
+                    call.application.environment.log.info("Received Google Photos token")
                     call.respondRedirect("/start.html")
                 }
             }
@@ -89,10 +91,13 @@ fun main() {
             }
 
             webSocket("/server") {
+                call.application.environment.log.info("New websocket connection received.")
+
                 val spotifyApi = SpotifyApi(spotifyAuth)
                 val photosApi = PhotosApi(config.photos.album, photosAuth)
 
                 if (prevTrack != null) {
+                    call.application.environment.log.info("Sending track: $prevTrack")
                     send(Json.encodeToString(prevTrack))
                 }
 
@@ -107,7 +112,7 @@ fun main() {
                     }
                     if (track != null) {
                         if (track != prevTrack) {
-                            call.application.environment.log.info("Changing track: $track (from $prevTrack)")
+                            call.application.environment.log.info("Sending track: $track")
                             send(Json.encodeToString(track))
                             prevTrack = track
                         }
@@ -115,6 +120,7 @@ fun main() {
                         // Photos
                         prevTrack = null
                         val photo = photosApi.getPhoto()
+                        call.application.environment.log.info("Sending photo: $photo")
                         send(Json.encodeToString(photo))
                         delay(config.photos.pollingMs - config.spotify.pollingMs)
                     }
