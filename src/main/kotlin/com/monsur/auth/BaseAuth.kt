@@ -147,7 +147,7 @@ open class BaseAuth(
         }
     }
     private fun getTokenFilePath(): String {
-        return "src/main/resources/$key.token.json"
+        return "$key.token.json"
     }
 
     private fun getRandomString(length: Int): String {
