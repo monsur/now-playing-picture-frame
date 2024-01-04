@@ -36,7 +36,7 @@ class SpotifyApi(private val auth: BaseAuth) {
             429 -> {
                 var retryAfter = 0
                 if (response.headers.contains("RetryAfter")) {
-                    retryAfter = response.headers.get("Retry-After")?.toInt() ?: 0
+                    retryAfter = response.headers["Retry-After"]?.toInt() ?: 0
                 }
                 throw RateLimitException("Rate limiting: 429", retryAfter)
             }
@@ -47,31 +47,31 @@ class SpotifyApi(private val auth: BaseAuth) {
 
     private suspend fun parseTrack(response: HttpResponse): Track? {
         val json = Json.decodeFromString<JsonObject>(response.bodyAsText())
-//        val isPlaying = (json.get("is_playing") as JsonPrimitive).content.toBoolean()
+//        val isPlaying = (json["is_playing"]) as JsonPrimitive).content.toBoolean()
 //        if (!isPlaying) {
 //            return null
 //        }
 
         // TODO: Support other playing types (e.g. podcast)
-        val type = (json.get("currently_playing_type") as JsonPrimitive).content
+        val type = (json["currently_playing_type"] as JsonPrimitive).content
         if (type != "track") {
             return null
         }
 
-        val item = json.get("item") as JsonObject
-        val id = (item.get("id") as JsonPrimitive).content
-        val name = (item.get("name") as JsonPrimitive).content
+        val item = json["item"] as JsonObject
+        val id = (item["id"] as JsonPrimitive).content
+        val name = (item["name"] as JsonPrimitive).content
 
-        val album = item.get("album") as JsonObject
-        val albumName = (album.get("name") as JsonPrimitive).content
-        val images = (album.get("images") as JsonArray)
-        val image = ((images[0] as JsonObject).get("url") as JsonPrimitive).content
+        val album = item["album"] as JsonObject
+        val albumName = (album["name"] as JsonPrimitive).content
+        val images = (album["images"] as JsonArray)
+        val image = ((images[0] as JsonObject)["url"] as JsonPrimitive).content
 
-        val artists = item.get("artists") as JsonArray
+        val artists = item["artists"] as JsonArray
         val a = mutableListOf<String>()
         artists.forEach {
             val artist = it as JsonObject
-            a.add((artist.get("name") as JsonPrimitive).content)
+            a.add((artist["name"] as JsonPrimitive).content)
         }
 
         return Track(id, name, albumName, image, a)
