@@ -15,9 +15,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -99,18 +97,23 @@ fun main() {
 
                 val spotifyApi = SpotifyApi(spotifyAuth)
                 val photosApi = PhotosApi(config.photos.album, photosAuth)
-                val pollingFactor = (config.photos.pollingMs/config.spotify.pollingMs).toInt()
+                val pollingFactor = (config.photos.pollingMs / config.spotify.pollingMs).toInt()
                 var i = 0
 
+                // When a client connects for a subsequent time (e.g. page refresh), it may be a while before the next
+                // socket response. Send the previous data so that page has some initial data.
+                // We only need to do this for Spotify since Spotify polls more often than it sends a response.
                 if (prevTrack != null) {
                     call.application.environment.log.info("Sending track: $prevTrack")
                     send(Json.encodeToString(prevTrack))
                 }
 
+                // Once the client connection is made, this socket stays open indefinitely
                 while (true) {
                     var pollingMs = config.spotify.pollingMs.toLong()
                     try {
                         var track = spotifyApi.getCurrentlyPlayingTrack()
+                        call.application.environment.log.trace("Track heartbeat: {}", track)
 
                         // Uncomment the line below to show photos when Spotify is paused.
                         //if (track != null && !track!!.isPlaying) {
@@ -118,12 +121,24 @@ fun main() {
                         //}
 
                         if (track == null) {
+                            // If the track is null, that means Spotify is no longer playing.
+                            // Send the next photo.
+                            // But since photos are sent less frequently than Spotify is polled, they should be sent
+                            // at a multiple of the Spotify polling time.
+                            // For example, if Spotify is polled every 5 seconds, and we want a photo every 30 seconds,
+                            // send a photo on 6th iteration of the loop (since 30/5 = 6).
                             if (i == 0) {
                                 val photo = photosApi.getPhoto()
+                                call.application.environment.log.info("Sending photo: $photo")
                                 send(Json.encodeToString(photo))
                             }
-                            i = (i+1)%pollingFactor
+                            i = (i + 1) % pollingFactor
                         } else if (track != prevTrack) {
+                            // Only send track info the client if its different from the previous track.
+                            // Note that this sends a track if the player changes playing state, since that affects
+                            // object equality.
+                            // TODO: Decide what the right thing to do when player state changes; depends on if we want to show play state in the UI.
+                            call.application.environment.log.info("Sending track: $track")
                             send(Json.encodeToString(track))
                             i = 0
                         }
