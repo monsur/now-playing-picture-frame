@@ -15,14 +15,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.time.Duration
 
-@OptIn(ExperimentalCoroutinesApi::class)
 fun main() {
     val parser = ConfigParser()
     val config = parser.read()
@@ -110,7 +108,7 @@ fun main() {
 
                 // Once the client connection is made, this socket stays open indefinitely
                 while (true) {
-                    var pollingMs = config.spotify.pollingMs.toLong()
+                    var pollingMs = config.spotify.pollingMs
                     try {
                         var track = spotifyApi.getCurrentlyPlayingTrack()
                         call.application.environment.log.trace("Track heartbeat: {}", track)
