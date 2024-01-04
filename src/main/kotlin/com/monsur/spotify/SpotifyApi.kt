@@ -74,6 +74,8 @@ class SpotifyApi(private val auth: BaseAuth) {
             a.add((artist["name"] as JsonPrimitive).content)
         }
 
-        return Track(id, name, albumName, image, a)
+        val isPlaying = ((json["is_playing"]) as JsonPrimitive).content.toBoolean()
+
+        return Track(id, name, isPlaying, albumName, image, a)
     }
 }

@@ -15,12 +15,16 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.time.Duration
 
+@OptIn(ExperimentalCoroutinesApi::class)
 fun main() {
     val parser = ConfigParser()
     val config = parser.read()
@@ -95,6 +99,8 @@ fun main() {
 
                 val spotifyApi = SpotifyApi(spotifyAuth)
                 val photosApi = PhotosApi(config.photos.album, photosAuth)
+                val pollingFactor = (config.photos.pollingMs/config.spotify.pollingMs).toInt()
+                var i = 0
 
                 if (prevTrack != null) {
                     call.application.environment.log.info("Sending track: $prevTrack")
@@ -102,29 +108,32 @@ fun main() {
                 }
 
                 while (true) {
-                    var track: Track? = null
+                    var pollingMs = config.spotify.pollingMs.toLong()
                     try {
-                        track = spotifyApi.getCurrentlyPlayingTrack()
-                    } catch (e: RateLimitException) {
-                        val retryAfter: Long = e.retryAfter*2000L
-                        call.application.environment.log.info("Pausing for {$retryAfter}ms due to rate limit.")
-                        delay(retryAfter)
-                    }
-                    if (track != null) {
-                        if (track != prevTrack) {
-                            call.application.environment.log.info("Sending track: $track")
+                        var track = spotifyApi.getCurrentlyPlayingTrack()
+
+                        // Uncomment the line below to show photos when Spotify is paused.
+                        //if (track != null && !track!!.isPlaying) {
+                        //    track = null
+                        //}
+
+                        if (track == null) {
+                            if (i == 0) {
+                                val photo = photosApi.getPhoto()
+                                send(Json.encodeToString(photo))
+                            }
+                            i = (i+1)%pollingFactor
+                        } else if (track != prevTrack) {
                             send(Json.encodeToString(track))
-                            prevTrack = track
+                            i = 0
                         }
-                    } else {
-                        // Photos
-                        prevTrack = null
-                        val photo = photosApi.getPhoto()
-                        call.application.environment.log.info("Sending photo: $photo")
-                        send(Json.encodeToString(photo))
-                        delay(config.photos.pollingMs - config.spotify.pollingMs)
+
+                        prevTrack = track
+                    } catch (e: RateLimitException) {
+                        pollingMs = e.retryAfter * 2000L
+                        call.application.environment.log.info("Pausing for {$pollingMs}ms due to rate limit.")
                     }
-                    delay(config.spotify.pollingMs)
+                    delay(pollingMs)
                 }
             }
         }
