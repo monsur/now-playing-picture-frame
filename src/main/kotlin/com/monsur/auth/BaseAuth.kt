@@ -5,11 +5,14 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.logging.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileNotFoundException
+
+internal val LOGGER = KtorSimpleLogger("com.monsur.auth.BaseAuth")
 
 open class BaseAuth(
     private val key: String,
@@ -39,7 +42,7 @@ open class BaseAuth(
             throw Exception(params["error"])
         }
 
-        val resp = AuthorizeResponse(params.get("code") ?: "", params.get("state") ?: "")
+        val resp = AuthorizeResponse(params["code"] ?: "", params["state"] ?: "")
 
         if (resp.state != state) {
             throw Exception("State mismatch: $resp.state != $state")
@@ -66,6 +69,7 @@ open class BaseAuth(
                 newToken.refresh_token = token!!.refresh_token
             }
             setToken(newToken)
+            LOGGER.info("Refreshed token")
         }
     }
 

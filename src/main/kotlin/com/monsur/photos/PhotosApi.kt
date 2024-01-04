@@ -5,8 +5,11 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.logging.*
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
+
+internal val LOGGER = KtorSimpleLogger("com.monsur.photos.PhotosApi")
 
 class PhotosApi(private val albumId: String, private val auth: BaseAuth) {
     private val json = Json { ignoreUnknownKeys = true }
@@ -28,6 +31,7 @@ class PhotosApi(private val albumId: String, private val auth: BaseAuth) {
         }
         body += "}"
 
+        LOGGER.trace("Retrieving photos, next token = $nextToken")
         val response = client.request("https://photoslibrary.googleapis.com/v1/mediaItems:search") {
             method = HttpMethod.Post
             headers {

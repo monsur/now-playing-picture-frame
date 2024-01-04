@@ -5,10 +5,13 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.logging.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+
+internal val LOGGER = KtorSimpleLogger("com.monsur.spotify.SpotifyApi")
 
 class SpotifyApi(private val auth: BaseAuth) {
     private suspend fun retrieveCurrentlyPlayingTrack(): HttpResponse {
