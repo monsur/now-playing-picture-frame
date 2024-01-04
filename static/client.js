@@ -1,4 +1,4 @@
-const serverUri = "ws://127.0.0.1:5173/server";
+const serverUri = "ws://" + window.location.host + "/server";
 var socket;
 var i = 0;
 
