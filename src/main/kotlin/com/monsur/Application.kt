@@ -92,6 +92,18 @@ fun main() {
 
             webSocket("/server") {
                 call.application.environment.log.info("New websocket connection received.")
+                val photosApi = PhotosApi(config.photos.album, photosAuth)
+
+                while (true) {
+                    val photo = photosApi.getPhoto()
+                    call.application.environment.log.info("Sending photo: $photo")
+                    send(Json.encodeToString(photo))
+                    delay(config.photos.pollingMs)
+                }
+
+                /* Uncomment this block too add Spotify support.
+                // The code below combines Spotify polling with photos retrieval.
+                // Commented out for now while I figure some stuff out.
 
                 val spotifyApi = SpotifyApi(spotifyAuth)
                 val photosApi = PhotosApi(config.photos.album, photosAuth)
@@ -148,6 +160,7 @@ fun main() {
                     }
                     delay(pollingMs)
                 }
+                 */
             }
         }
     }.start(wait = true)

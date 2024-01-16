@@ -16,4 +16,16 @@ data class MediaItem(
 )
 
 @Serializable
-data class MediaMetadata(val creationTime: String, val width: Int, val height: Int)
+data class MediaMetadata(
+    val creationTime: String,
+    val width: Int,
+    val height: Int,
+    val photo: PhotoMetadata? = null,
+    val video: VideoMetadata? = null
+)
+
+@Serializable
+data class PhotoMetadata(val cameraMake: String = "")
+
+@Serializable
+data class VideoMetadata(val cameraMake: String = "")

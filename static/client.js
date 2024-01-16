@@ -2,32 +2,6 @@ const serverUri = "ws://" + window.location.host + "/server";
 var socket;
 var i = 0;
 
-var isPhoto = function (data) {
-  return data.productUrl;
-};
-
-var getPhotoElement = function (data) {
-  var elem = $("<img />", { src: data.baseUrl + "=w2048-h1024" });
-  elem.css("position", "absolute");
-
-  width = window.innerWidth;
-  height = window.innerHeight;
-  if (width > height) {
-    width =
-      (window.innerHeight * data.mediaMetadata.width) /
-      data.mediaMetadata.height;
-  } else {
-    height =
-      (window.innerWidth * data.mediaMetadata.height) /
-      data.mediaMetadata.width;
-  }
-  elem.height(height).width(width);
-  elem.css("left", (window.innerWidth - width) / 2);
-  elem.css("top", (window.innerHeight - height) / 2);
-
-  return elem;
-};
-
 var getTrackElement = function (data) {
   var elem = $("<div />", { class: "spotifyContent" });
   elem.css("right", "0px");
@@ -51,8 +25,29 @@ var onMessage = function (data) {
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
   var elem = null;
-  if (isPhoto(data)) {
-    elem = getPhotoElement(data);
+  if (data.productUrl) {
+    if (data.mediaMetadata.hasOwnProperty("photo")) {
+      elem = $("<img />", { src: data.baseUrl + "=w2048-h1024" });
+    } else if (data.mediaMetadata.hasOwnProperty("video")) {
+      elem = $("<video />").attr("autoplay", "true").attr("muted", "muted").attr("preload", "auto").attr("src", data.baseUrl + "=dv");
+      elem[0].volume = 0;
+    }
+    elem.css("position", "absolute");
+
+    width = window.innerWidth;
+    height = window.innerHeight;
+    if (width > height) {
+      width =
+        (window.innerHeight * data.mediaMetadata.width) /
+        data.mediaMetadata.height;
+    } else {
+      height =
+        (window.innerWidth * data.mediaMetadata.height) /
+        data.mediaMetadata.width;
+    }
+    elem.height(height).width(width);
+    elem.css("left", (window.innerWidth - width) / 2);
+    elem.css("top", (window.innerHeight - height) / 2);
   } else {
     elem = getTrackElement(data);
     backgroundImage = data.image;
