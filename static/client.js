@@ -29,7 +29,7 @@ var onMessage = function (data) {
     if (data.mediaMetadata.hasOwnProperty("photo")) {
       elem = $("<img />", { src: data.baseUrl + "=w2048-h1024" });
     } else if (data.mediaMetadata.hasOwnProperty("video")) {
-      elem = $("<video />").attr("autoplay", "true").attr("muted", "muted").attr("preload", "auto").attr("src", data.baseUrl + "=dv");
+      elem = $("<video />").attr("autoplay", "true").attr("muted", "muted").attr("src", data.baseUrl + "=dv");
       elem[0].volume = 0;
     }
     elem.css("position", "absolute");
