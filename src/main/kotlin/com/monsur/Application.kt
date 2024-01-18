@@ -53,6 +53,12 @@ fun main() {
             masking = false
         }
         install(Routing) {
+            route("/health") {
+                get {
+                    call.respondText("OK")
+                }
+            }
+
             route("/spotify/login") {
                 get {
                     val authorizeUrl = spotifyAuth.getAuthorizeUrl()
