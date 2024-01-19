@@ -2,22 +2,22 @@
   "spotify": {
     "pollingMs": 5000,
     "auth": {
-      "clientId": "",
-      "clientSecret": "",
-      "redirectUri": "",
-      "scope": "",
+      "clientId": "ee1d9edff3124cf2ac2a8d2ef5c73300",
+      "clientSecret": "923329650ed446edacd933ea31b5df1c",
+      "redirectUri": "http://localhost:5173/spotify/callback",
+      "scope": "user-read-currently-playing",
       "authorizeUri": "https://accounts.spotify.com/authorize",
       "tokenUri": "https://accounts.spotify.com/api/token"
     }
   },
   "photos": {
-    "album": "",
+    "album": "AHlsshG4d3OAe6fqt7ve1lFu9ma1I6wuxu9Ks17aKJbnVaEH2VbYvCgqpcID28teszZSYybq2f3i",
     "pollingMs": 30000,
     "auth": {
-      "clientId": "",
-      "clientSecret": "",
-      "redirectUri": "",
-      "scope": "",
+      "clientId": "199740454477-gfqb0ljshegdqk5jsl7vvd1pfaaii7tg.apps.googleusercontent.com",
+      "clientSecret": "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",
+      "redirectUri": "http://localhost:5173/photos/callback",
+      "scope": "https://www.googleapis.com/auth/photoslibrary.readonly",
       "authorizeUri": "https://accounts.google.com/o/oauth2/v2/auth",
       "tokenUri": "https://oauth2.googleapis.com/token"
     }
