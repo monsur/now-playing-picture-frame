@@ -2,7 +2,7 @@
 
 export DISPLAY=:0
 
-unclutter -root &
+unclutter -root -idle 0 &
 
 cd /home/monsur/Documents/Projects/now-playing-picture-frame
 
@@ -15,4 +15,4 @@ do
   response=$(curl --write-out %{http_code} --silent --output /dev/null http://localhost:5173/health)
 done
 
-chromium --start-fullscreen http://localhost:5173/client.html &
+chromium-browser --kiosk --incognito http://localhost:5173/client.html &
